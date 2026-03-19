@@ -2,11 +2,11 @@
 
 ## Recommended stack
 - Frontend and server runtime: Vercel
-- Database: Managed PostgreSQL
+- Database: MySQL-compatible database
 - ORM: Prisma
 
 ## Pre-deployment steps
-1. Create the PostgreSQL database.
+1. Create the MySQL database.
 2. Add the production environment variables from `.env.example`.
 3. Ensure `NEXT_PUBLIC_SITE_URL` matches the production domain.
 4. Set the intended production admin credentials through `ADMIN_SEED_EMAIL` and `ADMIN_SEED_PASSWORD`.
@@ -33,6 +33,6 @@ npm run build
 - Confirm `sitemap.xml` and `robots.txt` are reachable.
 
 ## Operational notes
-- The API routes and admin actions depend on a working PostgreSQL connection.
+- The API routes and admin actions depend on a working MySQL connection.
 - If you want to force demo reads without DB-backed storefront queries, set `USE_DEMO_DATA=true`.
 - For production, keep `USE_DEMO_DATA=false` and seed the live database.

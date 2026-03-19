@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -84,7 +84,7 @@ model User {
   passwordHash String?
   emailVerifiedAt DateTime?
   phone        String?
-  image        String?
+  image        String?    @db.Text
   isActive     Boolean    @default(true)
   customer     Customer?
   userRoles    UserRole[]
@@ -182,8 +182,8 @@ model Category {
   name           String
   nameSw         String
   slug           String        @unique
-  description    String
-  descriptionSw  String
+  description    String        @db.Text
+  descriptionSw  String        @db.Text
   icon           String
   featured       Boolean       @default(false)
   sortOrder      Int           @default(0)
@@ -199,8 +199,8 @@ model Subcategory {
   name           String
   nameSw         String
   slug           String    @unique
-  description    String?
-  descriptionSw  String?
+  description    String?   @db.Text
+  descriptionSw  String?   @db.Text
   category       Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   products       Product[]
   createdAt      DateTime  @default(now())
@@ -211,10 +211,10 @@ model Brand {
   id          String    @id @default(cuid())
   name        String
   slug        String    @unique
-  description String?
+  description String?   @db.Text
   country     String?
   featured    Boolean   @default(false)
-  logoUrl     String?
+  logoUrl     String?   @db.Text
   products    Product[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -234,23 +234,23 @@ model Product {
   discountPrice        Int?
   availabilityStatus   AvailabilityStatus
   warrantyPeriodMonths Int
-  shortDescription     String
-  shortDescriptionSw   String
-  fullDescription      String
-  fullDescriptionSw    String
+  shortDescription     String              @db.Text
+  shortDescriptionSw   String              @db.Text
+  fullDescription      String              @db.LongText
+  fullDescriptionSw    String              @db.LongText
   keyFeatures          Json
   keyFeaturesSw        Json
-  energyDetails        String
-  dimensions           String
+  energyDetails        String              @db.Text
+  dimensions           String              @db.Text
   weightKg             Float?
-  videoUrl             String?
+  videoUrl             String?             @db.Text
   featured             Boolean             @default(false)
   trending             Boolean             @default(false)
   newArrival           Boolean             @default(false)
   averageRating        Float               @default(0)
   reviewCount          Int                 @default(0)
   deliveryEligible     Boolean             @default(true)
-  installationInfo     String?
+  installationInfo     String?             @db.Text
   published            Boolean             @default(true)
   brand                Brand               @relation(fields: [brandId], references: [id], onDelete: Restrict)
   category             Category            @relation(fields: [categoryId], references: [id], onDelete: Restrict)
@@ -269,8 +269,8 @@ model Product {
 model ProductImage {
   id        String   @id @default(cuid())
   productId String
-  url       String
-  altText   String?
+  url       String   @db.Text
+  altText   String?  @db.Text
   position  Int      @default(0)
   isPrimary Boolean  @default(false)
   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
@@ -282,7 +282,7 @@ model ProductSpecification {
   productId String
   groupName String
   label     String
-  value     String
+  value     String   @db.Text
   sortOrder Int      @default(0)
   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
@@ -344,7 +344,7 @@ model Coupon {
   id                String   @id @default(cuid())
   code              String   @unique
   name              String
-  description       String?
+  description       String?   @db.Text
   discountType      String
   discountValue     Int
   minOrderAmount    Int?
@@ -370,7 +370,7 @@ model Order {
   guestEmail        String?
   guestPhone        String?
   deliveryRegion    String
-  notes             String?
+  notes             String?        @db.Text
   status            OrderStatus    @default(PENDING)
   paymentMethod     PaymentMethod
   subtotal          Int
@@ -411,9 +411,9 @@ model Payment {
   method       PaymentMethod
   status       PaymentStatus      @default(PENDING)
   amount       Int
-  reference    String?
+  reference    String?            @db.Text
   providerName String?
-  instructions String?
+  instructions String?            @db.Text
   paidAt       DateTime?
   order        Order              @relation(fields: [orderId], references: [id], onDelete: Cascade)
   transactions PaymentTransaction[]
@@ -440,7 +440,7 @@ model Review {
   name             String
   title            String?
   rating           Int
-  body             String
+  body             String       @db.LongText
   status           ReviewStatus @default(PENDING)
   verifiedPurchase Boolean      @default(false)
   product          Product      @relation(fields: [productId], references: [id], onDelete: Cascade)
@@ -455,8 +455,8 @@ model Testimonial {
   city      String
   role      String
   roleSw    String
-  quote     String
-  quoteSw   String
+  quote     String   @db.Text
+  quoteSw   String   @db.Text
   rating    Int
   featured  Boolean  @default(true)
   createdAt DateTime @default(now())
@@ -469,14 +469,14 @@ model Banner {
   id          String   @id @default(cuid())
   eyebrow     String
   eyebrowSw   String
-  title       String
+  title       String   @db.Text
   titleSw     String
-  description String
-  descriptionSw String
+  description String   @db.LongText
+  descriptionSw String @db.LongText
   ctaLabel    String
   ctaLabelSw  String
   ctaHref     String
-  imageUrl    String?
+  imageUrl    String?  @db.Text
   placement   String   @unique @default("HOME_HERO")
   active      Boolean  @default(true)
   sortOrder   Int      @default(0)
@@ -490,7 +490,7 @@ model ContactInquiry {
   email     String
   phone     String?
   subject   String
-  message   String
+  message   String   @db.LongText
   status    String   @default("NEW")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -520,7 +520,7 @@ model VerificationCode {
 model SupportConversation {
   id            String                    @id @default(cuid())
   customerId    String
-  subject       String
+  subject       String                    @db.Text
   status        SupportConversationStatus @default(OPEN)
   lastMessageAt DateTime                  @default(now())
   customer      Customer                  @relation(fields: [customerId], references: [id], onDelete: Cascade)
@@ -550,7 +550,7 @@ model SiteSetting {
   id          String   @id @default(cuid())
   key         String   @unique
   value       Json
-  description String?
+  description String? @db.Text
   updatedAt   DateTime @updatedAt
 }
 
@@ -560,7 +560,7 @@ model AuditLog {
   action     AuditAction
   entityType String
   entityId   String?
-  message    String
+  message    String    @db.Text
   metadata   Json?
   user       User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
   createdAt  DateTime    @default(now())

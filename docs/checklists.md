@@ -2,9 +2,9 @@
 
 - Node.js 22+ installed and available on `PATH`
 - `.env` populated correctly
-- PostgreSQL reachable from the app runtime
+- MySQL reachable from the app runtime
 - Prisma client generated
-- Migrations applied
+- Schema sync applied
 - Seed completed successfully
 - Admin login verified
 - Product catalog visible on storefront

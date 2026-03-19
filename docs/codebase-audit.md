@@ -18,7 +18,7 @@
 - No deployment-ready env separation or seed workflow.
 
 ## Tactical upgrades made
-- Added Prisma/PostgreSQL schema and seed workflow.
+- Added Prisma/MySQL schema and seed workflow.
 - Added Auth.js credential flow with server-protected admin routes.
 - Rebuilt the catalog around appliance categories, brands, and product detail pages.
 - Added TZS pricing helpers, checkout API, order tracking API, contact/newsletter APIs, and review submission API.

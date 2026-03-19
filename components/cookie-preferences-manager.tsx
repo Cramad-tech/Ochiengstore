@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useSyncExternalStore } from "react"
+import { useMemo, useState, useSyncExternalStore } from "react"
 
 import {
   readCookiePreferences,
@@ -11,27 +11,24 @@ import {
 
 export function CookiePreferencesManager({ compact = false }: { compact?: boolean }) {
   const preferences = useSyncExternalStore(subscribeToCookiePreferences, readCookiePreferences, () => null)
-  const [functional, setFunctional] = useState(true)
-  const [analytics, setAnalytics] = useState(false)
-
-  useEffect(() => {
-    if (!preferences) {
-      setFunctional(true)
-      setAnalytics(false)
-      return
-    }
-
-    setFunctional(preferences.functional)
-    setAnalytics(preferences.analytics)
-  }, [preferences])
+  const [draft, setDraft] = useState<{ functional: boolean; analytics: boolean } | null>(null)
+  const currentPreferences = useMemo(
+    () =>
+      draft ?? {
+        functional: preferences?.functional ?? true,
+        analytics: preferences?.analytics ?? false,
+      },
+    [draft, preferences],
+  )
 
   const savePreferences = (status: CookieConsentStatus) => {
     saveCookiePreferences({
       essential: true,
-      functional,
-      analytics,
+      functional: currentPreferences.functional,
+      analytics: currentPreferences.analytics,
       status,
     })
+    setDraft(null)
   }
 
   return (
@@ -51,7 +48,12 @@ export function CookiePreferencesManager({ compact = false }: { compact?: boolea
           <p className="font-semibold text-foreground">Functional storage</p>
           <p className="mt-1 text-sm text-muted-foreground">Remember cart, wishlist, and language preferences on this device.</p>
         </div>
-        <input type="checkbox" checked={functional} onChange={(event) => setFunctional(event.target.checked)} className="mt-1 size-4 accent-[var(--primary)]" />
+        <input
+          type="checkbox"
+          checked={currentPreferences.functional}
+          onChange={(event) => setDraft((current) => ({ ...(current ?? currentPreferences), functional: event.target.checked }))}
+          className="mt-1 size-4 accent-[var(--primary)]"
+        />
       </label>
 
       <label className="flex items-start justify-between gap-4 rounded-[1.3rem] border border-border bg-card px-4 py-4">
@@ -59,7 +61,12 @@ export function CookiePreferencesManager({ compact = false }: { compact?: boolea
           <p className="font-semibold text-foreground">Analytics</p>
           <p className="mt-1 text-sm text-muted-foreground">Help us understand performance and improve the shopping experience.</p>
         </div>
-        <input type="checkbox" checked={analytics} onChange={(event) => setAnalytics(event.target.checked)} className="mt-1 size-4 accent-[var(--primary)]" />
+        <input
+          type="checkbox"
+          checked={currentPreferences.analytics}
+          onChange={(event) => setDraft((current) => ({ ...(current ?? currentPreferences), analytics: event.target.checked }))}
+          className="mt-1 size-4 accent-[var(--primary)]"
+        />
       </label>
 
       <div className={`flex ${compact ? "flex-col gap-3" : "flex-col gap-3 sm:flex-row sm:flex-wrap"}`}>
@@ -73,8 +80,7 @@ export function CookiePreferencesManager({ compact = false }: { compact?: boolea
         <button
           type="button"
           onClick={() => {
-            setFunctional(false)
-            setAnalytics(false)
+            setDraft(null)
             saveCookiePreferences({
               essential: true,
               functional: false,
@@ -88,14 +94,15 @@ export function CookiePreferencesManager({ compact = false }: { compact?: boolea
         </button>
         <button
           type="button"
-          onClick={() =>
+          onClick={() => {
+            setDraft(null)
             saveCookiePreferences({
               essential: true,
               functional: true,
               analytics: true,
               status: "accepted",
             })
-          }
+          }}
           className="inline-flex items-center justify-center rounded-full border border-primary/20 bg-primary/8 px-5 py-3 text-sm font-semibold text-primary"
         >
           Accept all

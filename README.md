@@ -1,6 +1,6 @@
 # Ochieng Home Appliances
 
-Tanzania-focused ecommerce platform for home appliances built with Next.js App Router, Prisma, PostgreSQL, Auth.js, and Tailwind CSS.
+Tanzania-focused ecommerce platform for home appliances built with Next.js App Router, Prisma, MySQL, Auth.js, and Tailwind CSS.
 
 ## What changed
 - Replaced the old client-only marketplace prototype with a server-capable ecommerce structure.
@@ -10,41 +10,42 @@ Tanzania-focused ecommerce platform for home appliances built with Next.js App R
 - Added `sitemap.ts`, `robots.ts`, metadata improvements, and structured product JSON-LD.
 
 ## Setup
-1. Install Node.js 22+ and a package manager (`npm` or `pnpm`).
+1. Install Node.js 22+ and make sure XAMPP MySQL is installed locally.
 2. Copy `.env.example` to `.env` and fill in the values.
-   The included `DATABASE_URL` is only a template. Replace `REPLACE_WITH_YOUR_POSTGRES_PASSWORD` with the real password for your local PostgreSQL user before running Prisma commands.
+   The included `DATABASE_URL` is set up for the default XAMPP MySQL user (`root` with no password). If your MySQL user has a password, update the URL before running Prisma commands.
 3. Install dependencies:
 
 ```bash
 npm install
 ```
 
-4. Generate Prisma client and apply the schema:
+4. Start MySQL from XAMPP and create the database:
+
+```bash
+C:\xampp\mysql_start.bat
+C:\xampp\mysql\bin\mysql.exe -u root -e "CREATE DATABASE IF NOT EXISTS ochiengstore CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+```
+
+5. Generate Prisma client and sync the schema:
 
 ```bash
 npm run db:generate
 npm run db:migrate
 ```
 
-The default migration command is set up for first-time local bootstrapping. For future schema changes, you can also run a named migration directly, for example:
-
-```bash
-npx prisma migrate dev --name add-order-notes
-```
-
-5. Seed the catalog and admin account:
+6. Seed the catalog and admin account:
 
 ```bash
 npm run db:seed
 ```
 
-6. Verify that the backend, seed data, and database are ready:
+7. Verify that the backend, seed data, and database are ready:
 
 ```bash
 npm run verify:backend
 ```
 
-7. Start the app:
+8. Start the app:
 
 ```bash
 npm run dev
@@ -67,7 +68,7 @@ Use the values in `.env.example` as the baseline. The most important variables a
 
 In local development, Auth.js now falls back to a stable project-specific secret if `.env` has not been created yet. Keep using a real `AUTH_SECRET` in any shared or production environment.
 
-## Database and migrations
+## Database and schema sync
 - Prisma schema: `prisma/schema.prisma`
 - Seed script: `prisma/seed.ts`
 - Recommended workflow:
@@ -79,10 +80,10 @@ npm run db:seed
 npm run verify:backend
 ```
 
-If you need a fast local sync while iterating:
+If you need a fresh rebuild against local MySQL:
 
 ```bash
-npm run db:push
+npm run db:reset
 ```
 
 ## Testing
@@ -107,11 +108,11 @@ Seeded local test accounts:
 - Customer: `customer@ochiengstore.co.tz` / `Customer123!`
 
 ## Deployment
-Recommended target: Vercel + managed PostgreSQL.
+Recommended target: a Node-capable host with MySQL, or local XAMPP for development.
 
-1. Provision a PostgreSQL database.
+1. Provision a MySQL-compatible database.
 2. Add all `.env` variables in Vercel project settings.
-3. Run migrations during deployment or before first release.
+3. Sync the schema before first release.
 4. Seed the production database once with the intended admin credentials.
 5. Set `NEXT_PUBLIC_SITE_URL` to the production domain.
 

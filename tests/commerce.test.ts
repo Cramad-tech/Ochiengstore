@@ -11,6 +11,7 @@ describe("commerce helpers", () => {
       district: "Ilala",
       addressLine: "Kariakoo",
       notes: "",
+      acceptPolicies: true,
       paymentMethod: "CASH_ON_DELIVERY",
       items: [
         { slug: "tv", name: "TV", price: 1000000, quantity: 1 },

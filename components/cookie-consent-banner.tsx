@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useEffect, useState, useSyncExternalStore } from "react"
+import { useState, useSyncExternalStore } from "react"
 import { ShieldCheck } from "lucide-react"
 
 import { CookiePreferencesManager } from "@/components/cookie-preferences-manager"
@@ -9,12 +9,12 @@ import { readCookiePreferences, saveCookiePreferences, subscribeToCookiePreferen
 
 export function CookieConsentBanner() {
   const preferences = useSyncExternalStore(subscribeToCookiePreferences, readCookiePreferences, () => null)
-  const [isReady, setIsReady] = useState(false)
+  const isReady = useSyncExternalStore(
+    () => () => undefined,
+    () => true,
+    () => false,
+  )
   const [isManaging, setIsManaging] = useState(false)
-
-  useEffect(() => {
-    setIsReady(true)
-  }, [])
 
   if (!isReady || preferences) {
     return null
