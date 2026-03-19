@@ -93,7 +93,7 @@ export default async function AccountPage() {
                 defaultValue={defaultAddress?.region ?? settings.regions[0] ?? "Dar es Salaam"}
                 className="rounded-2xl border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:outline-none"
               >
-                {settings.regions.map((region) => (
+                {settings.regions.map((region: string) => (
                   <option key={region} value={region}>
                     {region}
                   </option>

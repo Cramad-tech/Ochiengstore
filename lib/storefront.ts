@@ -176,7 +176,7 @@ function filterProducts(products: StoreProduct[], filters: ProductFilters = {}) 
   return results
 }
 
-export async function getSiteSettings() {
+export async function getSiteSettings(): Promise<SiteSettingsShape> {
   if (shouldUseDemoData()) {
     return applySiteSettingOverrides(SITE_SETTINGS_FALLBACK)
   }
